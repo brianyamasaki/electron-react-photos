@@ -1,0 +1,24 @@
+
+.photoFrame {
+  height: 570px;
+  width: 470px;
+  margin: 5px;
+  padding: 10px;
+  border: 1px solid white;
+}
+
+img {
+  height: 450px;
+  width: 450px;
+  object-fit:scale-down;
+  overflow-x: hidden;
+}
+
+ul {
+  padding: 0;
+}
+
+li {
+  display: inline-block;
+  margin-right: 1rem;
+}

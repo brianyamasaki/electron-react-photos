@@ -4,7 +4,9 @@ import path from "node:path";
 import { ExifImage } from 'node-exif';
 import dayjs from "dayjs";
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
-import type { ExifGeneric } from "includes";
+import { ExifGeneric, exifDateFormat } from "../includes";
+
+dayjs.extend(customParseFormat);
 
 // decimal from Degrees, minutes, seconds
 export const decFromDms = (gps: number[]) => (gps[0] + gps[1] / 60 + gps[2] / 3600)
@@ -46,26 +48,31 @@ export const getImgMetadata = (imgPath: string) => {
         .then(metadata => {
           new ExifImage({image: imgPath}, (error: Error | null, exifData: ExifGeneric) => {
             const unixTime = fs.statSync(imgPath).birthtime;
-            const exifLikeDate = dayjs(unixTime).format('YYYY:MM:DD hh:mm:ss');
+            const exifLikeDate = dayjs(unixTime).format(exifDateFormat);
             let result;
             if (error) {
               result = {
-                dateCreated: exifLikeDate,
+                filepath: imgPath,
                 filename: name,
                 fileExt: ext,
+                dateCreated: exifLikeDate,
+                unixTime,
                 metadata,
                 hasExif: false
-              };
+              } as ExifGeneric;
             } else {
+              const bestTime = exifData.exif.DateTimeOriginal || exifData.exif.CreateDate || exifLikeDate;
               result = {
-                dateCreated: exifData.exif.DateTimeOriginal || exifData.exif.CreateDate || exifLikeDate,
+                filepath: imgPath,
                 filename: name,
                 fileExt: ext,
+                dateCreated: bestTime,
+                unixTime: dayjs(bestTime, exifDateFormat).unix(),
                 metadata,
                 hasExif: true,
                 exif: exifData,
                 gps: gpsToDecimal(exifData.gps),
-              };
+              } as ExifGeneric;
             }
             resolve(result);
           })

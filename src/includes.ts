@@ -25,12 +25,17 @@ export type ExifGeneric = {
 };
 
 export type PhotoMetadata = {
-  dateCreated: string;
+  filepath: string;
   filename: string;
   fileExt: string;
+  dateCreated: string;
+  unixTime: number;
   metadata: any;
   hasExif: boolean;
   exif?: any;
   gps?: GpsDecimal;
   image?: any;
 };
+
+export const exifDateFormat = 'YYYY:MM:DD hh:mm:ss';
+export const userDateFormat = 'MMM D, YYYY h:m:s';
